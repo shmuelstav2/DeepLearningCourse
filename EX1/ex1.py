@@ -13,6 +13,8 @@ from keras import backend as K
 from keras import layers
 from keras.datasets import mnist
 from sklearn.model_selection import train_test_split
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 # %matplotlib inline
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -38,7 +40,7 @@ class EX1_FFN(BaseEstimator, ClassifierMixin):
         self.use_batchnorm = use_batchnorm
         self.cost_th = cost_th
         self.dropout= dropout
-
+        #fig, ax = plt.subplots()
     def fit(self, X, y=None):
         parameters, costs_train, costs_val, \
         accuracies_train, accuracies_val = self.L_layer_model(X, y, self.layers_dims, self.learning_rate,
@@ -138,11 +140,15 @@ class EX1_FFN(BaseEstimator, ClassifierMixin):
         Output:
         A – the activations of the layer
         activation_cache – returns Z, which will be useful for the backpropagation
+
         ::
         """
 
         activation_cache = Z
-        exps = np.exp(Z - np.max(Z))
+        np.subtract(Z , np.amax(Z,axis=0))
+        exps = np.exp(np.subtract(Z , np.amax(Z,axis=0)))
+        #exps = np.exp(Z - np.max(Z))
+        #exps = np.exp(Z)
         sum_vec = np.sum(exps, axis=0)
         if np.min(sum_vec) == 0:
             print("sum vec error")
@@ -544,7 +550,8 @@ def input_flatten(x):
 
 
 def plot_loss(cost_train, cost_val, accuracies_train, accuracies_val):
-    fig = plt.figure(figsize=(20, 30))
+    #fig = plt.figure(figsize=(20, 30))
+    fig, ax = plt.subplots(figsize=(20, 30))
     fig.suptitle('Log Loss over iterations')
 
     ax = fig.add_subplot(4, 1, 1)
@@ -566,7 +573,7 @@ def plot_loss(cost_train, cost_val, accuracies_train, accuracies_val):
     ax.plot(accuracies_val)
     ax.grid(True)
     ax.set(xlabel='iterations', title='Accuracy val')
-
+    plt.savefig('/data/home/shmuelstav/Moving Average dropout.png')
 
 
 def check_batch_size ():
